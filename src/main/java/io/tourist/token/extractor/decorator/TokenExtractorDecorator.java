@@ -19,9 +19,18 @@ public abstract class TokenExtractorDecorator implements TokenExtractor {
 	 * api.Shot)
 	 */
 	@Override
-	public String extractToken(final Shot shot) {
-		return tokenExtractor.extractToken(shot);
+	public final String extractToken(final Shot shot) {
+		return this.decorateToken(this.tokenExtractor.extractToken(shot));
 	}
+
+	/**
+	 * Decorate token.
+	 *
+	 * @param token
+	 *            the token
+	 * @return the string
+	 */
+	public abstract String decorateToken(String token);
 
 	/**
 	 * Sets the token extractor.
