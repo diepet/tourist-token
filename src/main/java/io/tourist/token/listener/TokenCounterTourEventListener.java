@@ -1,4 +1,4 @@
-package io.tourist.token;
+package io.tourist.token.listener;
 
 import io.tourist.core.api.Tour;
 import io.tourist.core.event.TourEventListenerAdapter;
