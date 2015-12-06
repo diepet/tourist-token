@@ -107,4 +107,14 @@ public final class MutableInteger implements Serializable, Comparable<MutableInt
 		}
 		return result;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return Integer.toString(this.value);
+	}
 }

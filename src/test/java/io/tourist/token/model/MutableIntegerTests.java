@@ -76,4 +76,12 @@ public class MutableIntegerTests {
 		MutableInteger mi = new MutableInteger(30);
 		Assert.assertEquals(30, mi.getValue());
 	}
+
+	@Test
+	public void testMutableIntegerToString() {
+		MutableInteger mi = new MutableInteger(30);
+		Assert.assertEquals("30", mi.toString());
+		mi.setValue(55);
+		Assert.assertEquals("55", mi.toString());
+	}
 }
