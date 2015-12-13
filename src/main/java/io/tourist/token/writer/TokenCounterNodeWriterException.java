@@ -23,7 +23,7 @@ public class TokenCounterNodeWriterException extends RuntimeException {
 	 * @param cause
 	 *            the cause
 	 */
-	public TokenCounterNodeWriterException(String message, Throwable cause) {
+	public TokenCounterNodeWriterException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
@@ -33,7 +33,7 @@ public class TokenCounterNodeWriterException extends RuntimeException {
 	 * @param message
 	 *            the message
 	 */
-	public TokenCounterNodeWriterException(String message) {
+	public TokenCounterNodeWriterException(final String message) {
 		super(message);
 	}
 
@@ -43,7 +43,7 @@ public class TokenCounterNodeWriterException extends RuntimeException {
 	 * @param cause
 	 *            the cause
 	 */
-	public TokenCounterNodeWriterException(Throwable cause) {
+	public TokenCounterNodeWriterException(final Throwable cause) {
 		super(cause);
 	}
 

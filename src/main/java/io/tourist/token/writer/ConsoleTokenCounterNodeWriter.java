@@ -6,7 +6,7 @@ import io.tourist.token.serializer.TokenCounterNodeSerializer;
 /**
  * The console token counter node writer class.
  */
-public class ConsoleTokenCounterNodeWriter implements TokenCounterNodeWriter {
+public final class ConsoleTokenCounterNodeWriter implements TokenCounterNodeWriter {
 
 	/** The serializer. */
 	private TokenCounterNodeSerializer serializer;
@@ -29,7 +29,7 @@ public class ConsoleTokenCounterNodeWriter implements TokenCounterNodeWriter {
 	 * @param serializer
 	 *            the new serializer
 	 */
-	public void setSerializer(TokenCounterNodeSerializer serializer) {
+	public void setSerializer(final TokenCounterNodeSerializer serializer) {
 		this.serializer = serializer;
 	}
 }

@@ -7,7 +7,7 @@ import java.io.Writer;
 /**
  * The console token counter node writer class.
  */
-public class FileTokenCounterNodeWriter extends IOTokenCounterNodeWriter implements TokenCounterNodeWriter {
+public final class FileTokenCounterNodeWriter extends IOTokenCounterNodeWriter implements TokenCounterNodeWriter {
 
 	/** The file. */
 	private String file;
@@ -15,6 +15,11 @@ public class FileTokenCounterNodeWriter extends IOTokenCounterNodeWriter impleme
 	/** The append. */
 	private boolean append;
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see io.tourist.token.writer.IOTokenCounterNodeWriter#createWriter()
+	 */
 	@Override
 	public Writer createWriter() throws IOException {
 		return new FileWriter(this.file, this.append);
@@ -26,7 +31,7 @@ public class FileTokenCounterNodeWriter extends IOTokenCounterNodeWriter impleme
 	 * @param file
 	 *            the new file
 	 */
-	public void setFile(String file) {
+	public void setFile(final String file) {
 		this.file = file;
 	}
 
@@ -36,7 +41,7 @@ public class FileTokenCounterNodeWriter extends IOTokenCounterNodeWriter impleme
 	 * @param append
 	 *            the new append
 	 */
-	public void setAppend(boolean append) {
+	public void setAppend(final boolean append) {
 		this.append = append;
 	}
 

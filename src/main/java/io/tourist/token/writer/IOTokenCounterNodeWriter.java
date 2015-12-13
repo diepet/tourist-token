@@ -15,7 +15,7 @@ import io.tourist.token.serializer.TokenCounterNodeSerializer;
 public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter {
 
 	/** The Constant AWAIT_TERMINATION_TIME_IN_SECONDS. */
-	private static final long AWAIT_TERMINATION_TIME_IN_SECONDS = 5l;
+	private static final long AWAIT_TERMINATION_TIME_IN_SECONDS = 5L;
 
 	/** The serializer. */
 	private TokenCounterNodeSerializer serializer;
@@ -24,7 +24,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	private boolean async = false;
 
 	/** The writer. */
-	protected Writer writer;
+	private Writer writer;
 
 	/** The executor service. */
 	private ExecutorService executorService;
@@ -37,7 +37,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * model.TokenCounterNode)
 	 */
 	@Override
-	public void write(final TokenCounterNode tokenCounterNode) {
+	public final void write(final TokenCounterNode tokenCounterNode) {
 		if (this.async) {
 			this.asyncWrite(tokenCounterNode);
 		} else {
@@ -51,7 +51,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * @param tokenCounterNode
 	 *            the token counter node
 	 */
-	public void syncWrite(final TokenCounterNode tokenCounterNode) {
+	private void syncWrite(final TokenCounterNode tokenCounterNode) {
 		try {
 			writer.write(serializer.serialize(tokenCounterNode).toString());
 		} catch (IOException e) {
@@ -65,7 +65,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * @param tokenCounterNode
 	 *            the token counter node
 	 */
-	public void asyncWrite(final TokenCounterNode tokenCounterNode) {
+	private void asyncWrite(final TokenCounterNode tokenCounterNode) {
 		this.executorService.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -77,7 +77,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	/**
 	 * Inits the file node writer.
 	 */
-	public void init() {
+	public final void init() {
 		if (this.async && this.executorService == null) {
 			// if not executor service is configured create a new single thread
 			// executor
@@ -93,7 +93,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	/**
 	 * Destroy.
 	 */
-	public void destroy() {
+	public final void destroy() {
 		if (this.async) {
 			this.executorService.shutdown();
 			try {
@@ -115,7 +115,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * @param serializer
 	 *            the new serializer
 	 */
-	public void setSerializer(TokenCounterNodeSerializer serializer) {
+	public final void setSerializer(final TokenCounterNodeSerializer serializer) {
 		this.serializer = serializer;
 	}
 
@@ -125,7 +125,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * @param async
 	 *            the new asynchronous flag
 	 */
-	public void setAsync(boolean async) {
+	public final void setAsync(final boolean async) {
 		this.async = async;
 	}
 
@@ -135,7 +135,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * @param executorService
 	 *            the new executor service
 	 */
-	public void setExecutorService(ExecutorService executorService) {
+	public final void setExecutorService(final ExecutorService executorService) {
 		this.executorService = executorService;
 	}
 
@@ -143,6 +143,8 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	 * Creates the writer.
 	 *
 	 * @return the writer
+	 * @throws IOException
+	 *             Signals that an I/O exception has occurred.
 	 */
 	public abstract Writer createWriter() throws IOException;
 }

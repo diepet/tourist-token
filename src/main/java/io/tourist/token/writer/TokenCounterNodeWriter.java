@@ -7,6 +7,12 @@ import io.tourist.token.model.TokenCounterNode;
  */
 public interface TokenCounterNodeWriter {
 
+	/**
+	 * Write.
+	 *
+	 * @param tokenCounterNode
+	 *            the token counter node
+	 */
 	void write(TokenCounterNode tokenCounterNode);
 
 }

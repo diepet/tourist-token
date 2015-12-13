@@ -14,7 +14,7 @@ import io.tourist.token.model.TokenCounterNode;
 /**
  * The text counter node serializer.
  */
-public class TextTokenCounterNodeSerializer implements TokenCounterNodeSerializer {
+public final class TextTokenCounterNodeSerializer implements TokenCounterNodeSerializer {
 
 	/** The Constant LEVEL_SEPARATOR. */
 	private static final String LEVEL_SEPARATOR = "\t";
@@ -147,7 +147,7 @@ public class TextTokenCounterNodeSerializer implements TokenCounterNodeSerialize
 	 * @param n
 	 *            the number of times to repeat
 	 */
-	private void repeat(final StringBuilder buffer, final String s, int n) {
+	private void repeat(final StringBuilder buffer, final String s, final int n) {
 		for (int i = 0; i < n; i++) {
 			buffer.append(s);
 		}
