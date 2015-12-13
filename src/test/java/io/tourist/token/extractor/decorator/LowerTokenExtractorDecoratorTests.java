@@ -34,7 +34,6 @@ public class LowerTokenExtractorDecoratorTests {
 		decorator.setTokenExtractor(this.tokenExtractor);
 		decorator.extractToken(null);
 		Assert.fail("Should not execute this");
-		;
 	}
 
 	private void mockTokenExtractor(String token) {

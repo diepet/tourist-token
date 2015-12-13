@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Stack;
 
+import io.tourist.core.api.CameraRoll;
 import io.tourist.core.api.Shot;
 import io.tourist.core.api.Tour;
 import io.tourist.core.event.TourEventListenerAdapter;
@@ -93,9 +94,11 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 		// create a new node
 		final TokenCounterNode node = new TokenCounterNode();
 		node.setTour(tour);
+		final Map<String, MutableInteger> tokenCountedMap = new HashMap<String, MutableInteger>();
+		node.setTokenCountedMap(tokenCountedMap);
 		// push node to stack
 		final Stack<TokenCounterNode> nodeStack = this.threadLocalNodeStack.get();
-		nodeStack.add(node);
+		nodeStack.push(node);
 	}
 
 	/**
@@ -113,13 +116,12 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 	 */
 	@Override
 	public void onTourEnded(final Tour tour) {
-		// count tokens and build map
-		final Map<String, MutableInteger> tokenCountedMap = this.countTokens(tour);
 		// pop node from stack
 		final Stack<TokenCounterNode> nodeStack = this.threadLocalNodeStack.get();
 		final TokenCounterNode node = nodeStack.pop();
-		// set previous built map to popped node
-		node.setTokenCountedMap(tokenCountedMap);
+		// get node map and increment its token counting from camera roll
+		final Map<String, MutableInteger> tokenCountedMap = node.getTokenCountedMap();
+		incrementTokenCountedMapFromCameraRoll(tour.getCameraRoll(), tokenCountedMap);
 		// update parent node relationship and incrementing its node token
 		// counted map
 		if (!nodeStack.isEmpty()) {
@@ -189,15 +191,16 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 	}
 
 	/**
-	 * Count tokens.
+	 * Increment node token counted map from camera roll.
 	 *
-	 * @param tour
-	 *            the tour
-	 * @return the map
+	 * @param cameraRoll
+	 *            the camera roll
+	 * @param tokenCountedMap
+	 *            the token counted map
 	 */
-	private Map<String, MutableInteger> countTokens(final Tour tour) {
-		final List<Shot> shotList = tour.getCameraRoll().getShotList();
-		final Map<String, MutableInteger> tokenCountedMap = new HashMap<String, MutableInteger>();
+	private void incrementTokenCountedMapFromCameraRoll(final CameraRoll cameraRoll,
+			final Map<String, MutableInteger> tokenCountedMap) {
+		final List<Shot> shotList = cameraRoll.getShotList();
 		String token;
 		MutableInteger currentValue;
 		for (final Shot shot : shotList) {
@@ -211,7 +214,6 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 				}
 			}
 		}
-		return tokenCountedMap;
 	}
 
 	/**
