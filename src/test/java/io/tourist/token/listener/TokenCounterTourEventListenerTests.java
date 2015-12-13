@@ -1,8 +1,6 @@
 package io.tourist.token.listener;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,9 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockRule;
-import org.easymock.IAnswer;
 import org.easymock.Mock;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,7 +16,6 @@ import org.junit.Test;
 import io.tourist.core.api.CameraRoll;
 import io.tourist.core.api.Shot;
 import io.tourist.core.api.Tour;
-import io.tourist.core.event.ShotPrinterTourEventListener;
 
 public class TokenCounterTourEventListenerTests {
 	@Rule
@@ -59,9 +54,6 @@ public class TokenCounterTourEventListenerTests {
 	@Mock
 	private Shot thirdShot;
 
-	@Mock
-	private OutputStream outputStream;
-
 	@Before
 	public void setUp() {
 		this.initMocks();
@@ -69,77 +61,7 @@ public class TokenCounterTourEventListenerTests {
 
 	@Test
 	public void testSingleDummyMethod() {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ShotPrinterTourEventListener shotPrinterTourEventListener = new ShotPrinterTourEventListener(baos);
-		shotPrinterTourEventListener.onTouristTravelStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourEnded(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTouristTravelEnded(this.tourDummyMethod);
-		String[] lines = baos.toString().split(String.format("%n"));
-		Assert.assertEquals(5, lines.length);
-		Assert.assertEquals("-- START TRAVEL --", lines[0]);
-		Assert.assertEquals("dummyMethod():", lines[1]);
-		Assert.assertEquals("\tSHOT #1: first shot", lines[2]);
-		Assert.assertEquals("\tSHOT #2: second shot", lines[3]);
-		Assert.assertEquals("-- END TRAVEL --", lines[4]);
-	}
 
-	@Test
-	public void testFailedSingleDummyMethod() {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ShotPrinterTourEventListener shotPrinterTourEventListener = new ShotPrinterTourEventListener(baos);
-		shotPrinterTourEventListener.onTouristTravelStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourFailed(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTouristTravelEnded(this.tourDummyMethod);
-		String[] lines = baos.toString().split(String.format("%n"));
-		Assert.assertEquals(4, lines.length);
-		Assert.assertEquals("-- START TRAVEL --", lines[0]);
-		Assert.assertEquals("dummyMethod():", lines[1]);
-		Assert.assertEquals("\tEXCEPTION THROWN: java.lang.RuntimeException", lines[2]);
-		Assert.assertEquals("-- END TRAVEL --", lines[3]);
-	}
-
-	@Test
-	public void testInnerDummyMethod() {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ShotPrinterTourEventListener shotPrinterTourEventListener = new ShotPrinterTourEventListener(baos);
-		shotPrinterTourEventListener.onTouristTravelStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourStarted(this.tourInnerDummyMethod);
-		shotPrinterTourEventListener.onTourEnded(this.tourInnerDummyMethod);
-		shotPrinterTourEventListener.onTourEnded(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTouristTravelEnded(this.tourDummyMethod);
-		String[] lines = baos.toString().split(String.format("%n"));
-		Assert.assertEquals(7, lines.length);
-		Assert.assertEquals("-- START TRAVEL --", lines[0]);
-		Assert.assertEquals("dummyMethod():", lines[1]);
-		Assert.assertEquals("\tinnerDummyMethod():", lines[2]);
-		Assert.assertEquals("\t\tSHOT #1: third shot", lines[3]);
-		Assert.assertEquals("\tSHOT #1: first shot", lines[4]);
-		Assert.assertEquals("\tSHOT #2: second shot", lines[5]);
-		Assert.assertEquals("-- END TRAVEL --", lines[6]);
-	}
-
-	@Test
-	public void testFailedInnerDummyMethod() {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ShotPrinterTourEventListener shotPrinterTourEventListener = new ShotPrinterTourEventListener(baos);
-		shotPrinterTourEventListener.onTouristTravelStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourStarted(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTourStarted(this.tourInnerDummyMethod);
-		shotPrinterTourEventListener.onTourFailed(this.tourInnerDummyMethod);
-		shotPrinterTourEventListener.onTourEnded(this.tourDummyMethod);
-		shotPrinterTourEventListener.onTouristTravelEnded(this.tourDummyMethod);
-		String[] lines = baos.toString().split(String.format("%n"));
-		Assert.assertEquals(7, lines.length);
-		Assert.assertEquals("-- START TRAVEL --", lines[0]);
-		Assert.assertEquals("dummyMethod():", lines[1]);
-		Assert.assertEquals("\tinnerDummyMethod():", lines[2]);
-		Assert.assertEquals("\t\tEXCEPTION THROWN: java.io.IOException", lines[3]);
-		Assert.assertEquals("\tSHOT #1: first shot", lines[4]);
-		Assert.assertEquals("\tSHOT #2: second shot", lines[5]);
-		Assert.assertEquals("-- END TRAVEL --", lines[6]);
 	}
 
 	private void initMocks() {
@@ -180,28 +102,4 @@ public class TokenCounterTourEventListenerTests {
 				this.tourInnerDummyMethod, this.cameraRollInnerDummyMethod, this.firstShot, this.secondShot,
 				this.thirdShot);
 	}
-
-	@Test
-	public void testOutputStreamIOExceptionNotPropagated() throws IOException {
-		EasyMock.reset(this.outputStream);
-		this.outputStream.write((byte[]) EasyMock.anyObject());
-		EasyMock.expectLastCall().andAnswer(new IAnswer<Object>() {
-			@Override
-			public Object answer() throws Throwable {
-				throw new IOException("Some IO exception");
-			}
-		});
-		EasyMock.replay(this.outputStream);
-		try {
-			ShotPrinterTourEventListener shotPrinterTourEventListener = new ShotPrinterTourEventListener(
-					this.outputStream);
-			shotPrinterTourEventListener.onTouristTravelStarted(this.tourDummyMethod);
-			shotPrinterTourEventListener.onTourStarted(this.tourDummyMethod);
-			shotPrinterTourEventListener.onTourEnded(this.tourDummyMethod);
-			shotPrinterTourEventListener.onTouristTravelEnded(this.tourDummyMethod);
-		} catch (Throwable exceptionCaught) {
-			Assert.fail("Unexpected exception thrown");
-		}
-	}
-
 }

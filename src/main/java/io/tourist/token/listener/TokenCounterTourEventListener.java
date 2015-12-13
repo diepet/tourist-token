@@ -13,6 +13,7 @@ import io.tourist.core.event.TourEventListenerAdapter;
 import io.tourist.token.extractor.TokenExtractor;
 import io.tourist.token.model.MutableInteger;
 import io.tourist.token.model.TokenCounterNode;
+import io.tourist.token.writer.TokenCounterNodeWriter;
 
 /**
  * The token counter tour event listener class.
@@ -27,6 +28,38 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 	/** The thread local node stack. */
 	private ThreadLocal<Stack<TokenCounterNode>> threadLocalNodeStack = new ThreadLocal<Stack<TokenCounterNode>>();
 
+	/** The thread local token counter node root. */
+	private ThreadLocal<TokenCounterNode> threadLocalNodeRoot = new ThreadLocal<TokenCounterNode>();
+
+	/** The token counter node writer. */
+	private TokenCounterNodeWriter tokenCounterNodeWriter;
+
+	/**
+	 * Sets the token extractor.
+	 *
+	 * @param tokenExtractor
+	 *            the new token extractor
+	 */
+	public void setTokenExtractor(final TokenExtractor tokenExtractor) {
+		this.tokenExtractor = tokenExtractor;
+	}
+
+	/**
+	 * Sets the token counter node writer.
+	 *
+	 * @param tokenCounterNodeWriter
+	 *            the new token counter node writer
+	 */
+	public void setTokenCounterNodeWriter(final TokenCounterNodeWriter tokenCounterNodeWriter) {
+		this.tokenCounterNodeWriter = tokenCounterNodeWriter;
+	}
+
+	/**
+	 * On tourist travel started.
+	 *
+	 * @param tour
+	 *            the tour
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -38,8 +71,16 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 	public void onTouristTravelStarted(final Tour tour) {
 		// allocate new stack
 		this.threadLocalNodeStack.set(new Stack<TokenCounterNode>());
+		// reset thread local node root
+		this.threadLocalNodeRoot.remove();
 	}
 
+	/**
+	 * On tour started.
+	 *
+	 * @param tour
+	 *            the tour
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -57,6 +98,12 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 		nodeStack.add(node);
 	}
 
+	/**
+	 * On tour ended.
+	 *
+	 * @param tour
+	 *            the tour
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -71,8 +118,10 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 		// pop node from stack
 		final Stack<TokenCounterNode> nodeStack = this.threadLocalNodeStack.get();
 		final TokenCounterNode node = nodeStack.pop();
-		// set map to popped node
+		// set previous built map to popped node
 		node.setTokenCountedMap(tokenCountedMap);
+		// update parent node relationship and incrementing its node token
+		// counted map
 		if (!nodeStack.isEmpty()) {
 			final TokenCounterNode parentNode = nodeStack.peek();
 			// add current node to its parent
@@ -80,9 +129,18 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 			// update parent node token counted map adding the current map
 			// values
 			incrementNodeTokenCountedMap(parentNode, tokenCountedMap);
+		} else {
+			// if stack is empty then the current node is the root node to write
+			this.threadLocalNodeRoot.set(node);
 		}
 	}
 
+	/**
+	 * On tour failed.
+	 *
+	 * @param tour
+	 *            the tour
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -94,10 +152,24 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 	public void onTourFailed(final Tour tour) {
 		// pop node from stack
 		final Stack<TokenCounterNode> nodeStack = this.threadLocalNodeStack.get();
-		nodeStack.pop();
-
+		final TokenCounterNode node = nodeStack.pop();
+		// update parent node relationship
+		if (!nodeStack.isEmpty()) {
+			final TokenCounterNode parentNode = nodeStack.peek();
+			// add current node to its parent
+			addCurrentNodeToParentNode(parentNode, node);
+		} else {
+			// if stack is empty then the current node is the root node to write
+			this.threadLocalNodeRoot.set(node);
+		}
 	}
 
+	/**
+	 * On tourist travel ended.
+	 *
+	 * @param tour
+	 *            the tour
+	 */
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -109,8 +181,11 @@ public final class TokenCounterTourEventListener extends TourEventListenerAdapte
 	public void onTouristTravelEnded(final Tour tour) {
 		// de-allocate stack
 		threadLocalNodeStack.remove();
-
-		// TODO add writer
+		// write token counter root node
+		final TokenCounterNode rootNode = this.threadLocalNodeRoot.get();
+		this.tokenCounterNodeWriter.write(rootNode);
+		// de-allocate token counter root node
+		this.threadLocalNodeRoot.remove();
 	}
 
 	/**
