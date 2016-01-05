@@ -54,6 +54,7 @@ public abstract class IOTokenCounterNodeWriter implements TokenCounterNodeWriter
 	private void syncWrite(final TokenCounterNode tokenCounterNode) {
 		try {
 			writer.write(serializer.serialize(tokenCounterNode).toString());
+			writer.flush();
 		} catch (IOException e) {
 			throw new TokenCounterNodeWriterException("Unable to write a token counter node", e);
 		}
